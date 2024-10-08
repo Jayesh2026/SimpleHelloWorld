@@ -6,4 +6,4 @@ services:
     ports:
       - "8081:8081"
 
-    image: jayesh2026/helloworld:latest
+    image: helloworld:latest
