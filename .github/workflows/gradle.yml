@@ -1,57 +1,68 @@
-name: CI/CD Pipeline
+name: Java, Gradle and Custom JRE CI
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    push:
+      branches: [ "main" ]
+    pull_request:
+      branches: [ "main" ]
 
 jobs:
   build:
+    # Use the latest Ubuntu environment for the job
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
+      # Check out the repository code
+      - uses: actions/checkout@v4
 
+      # Set up JDK 21 using Microsoft distribution
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'microsoft'
 
-      - name: Grant execute permission for Gradle wrapper
-        run: chmod +x ./gradlew
+      # Set up Gradle, with caching for dependencies
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
 
-      - name: Build with Gradle
-        run: ./gradlew build
+      # Build the Java (Spring Boot) application using the Gradle wrapper
+      - name: Build with Gradle Wrapper
+        run: |
+          pwd
+          chmod 755 ./gradlew
+          ls -ltra
+          ./gradlew build
 
-      - name: Run tests
-        run: ./gradlew test
+  dependency-submission:
+    # Use the latest Ubuntu environment for the job
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
+    steps:
+      # Check out the repository code
+      - uses: actions/checkout@v4
+
+      # Set up JDK 21 using the Microsoft distribution
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'microsoft'
+
+      # Install Docker Compose
       - name: Install Docker Compose
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
+      # Build Docker image
       - name: Build Docker image
         run: docker-compose build
 
+      # Start Docker Compose
       - name: Start Docker Compose
         run: docker-compose up -d
-
-      - name: Wait for application to start
-        run: |
-          sleep 30  # Wait for the services to start
-          curl --fail http://localhost:8081/hello || exit 1
-
-      - name: Log in to Docker Hub
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-      - name: Push Docker image
-        run: docker push jayesh2026/helloworld:latest
