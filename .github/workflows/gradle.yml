@@ -41,5 +41,5 @@ jobs:
       # Wait for the application to start and check health
       - name: Wait for application to start
         run: |
-          sleep 30
+          sleep 15
           curl --fail http://localhost:8081/hello || exit 1
