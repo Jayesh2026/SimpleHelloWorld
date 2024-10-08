@@ -35,6 +35,6 @@ COPY --from=builder /app/deps.txt /app/deps.txt
 
 WORKDIR /app
 
-EXPOSE 9090
+EXPOSE 8081
 
 ENTRYPOINT ["java", "-XX:ArchiveClassesAtExit=dynamic-cds.jsa", "-jar", "app.jar"]
