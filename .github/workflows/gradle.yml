@@ -45,7 +45,7 @@ jobs:
       - name: Wait for application to start
         run: |
           sleep 30  # Wait for the services to start
-          curl --fail http://localhost:8081/actuator/health || exit 1
+          curl --fail http://localhost:8081/hello || exit 1
 
       - name: Log in to Docker Hub
         env:
