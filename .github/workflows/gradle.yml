@@ -21,7 +21,7 @@ jobs:
           java-version: '21'
           distribution: 'microsoft'
 
-      # Grant execute permission for Gradle wrapper and build
+      # Grant execute permission for Gradle wrapper build
       - name: Build with Gradle Wrapper
         run: |
           chmod +x ./gradlew
