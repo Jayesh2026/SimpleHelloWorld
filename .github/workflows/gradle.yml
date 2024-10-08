@@ -21,18 +21,23 @@ jobs:
           java-version: '21'
           distribution: 'microsoft'
 
-      # Grant execute permission for Gradle wrapper build
+      # Grant execute permission for Gradle wrapper and build
       - name: Build with Gradle Wrapper
         run: |
           chmod +x ./gradlew
           ./gradlew build
+      # Install Docker Compose
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+      # Build Docker image
+      - name: Build Docker image
+        run: docker-compose build
 
-      # Set up Docker Compose using the Docker official action
-      - name: Set up Docker Compose
-        uses: docker/compose-action@v3
-        with:
-          build: helloworld  # Build the service defined in docker-compose.yml
-          up: helloworld      # Start the service defined in docker-compose.yml
+      # Start Docker Compose
+      - name: Start Docker Compose
+        run: docker-compose up -d
 
       # Wait for the application to start and check health
       - name: Wait for application to start
